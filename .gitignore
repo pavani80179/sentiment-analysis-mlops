@@ -2,3 +2,14 @@
 __pycache__/
 *.pyc
 .idea/
+
+# MLflow
+mlflow.db
+mlruns/
+
+# Trained models
+models/
+
+# Monitoring output
+monitoring/drift_report.html
+monitoring/predictions.csv
