@@ -13,3 +13,11 @@ models/
 # Monitoring output
 monitoring/drift_report.html
 monitoring/predictions.csv
+# Monitoring generated files
+monitoring/drift_report.html
+monitoring/evidently_results.json
+monitoring/predictions.csv
+monitoring/retraining_data.csv
+
+# Retrained candidate model
+models/bert_sentiment_kaggle_candidate/
