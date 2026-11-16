@@ -1,0 +1,4 @@
+[core]
+    remote = gcsremote
+['remote "gcsremote"']
+    url = gs://sentiment-mlops-dvc-oceanic-hold-514910-c5

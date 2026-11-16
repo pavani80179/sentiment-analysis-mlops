@@ -1,5 +1,7 @@
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from transformers import pipeline
 
@@ -20,16 +22,28 @@ app = FastAPI(
 
 
 # ==========================================================
-# CORS
+# CORS configuration
 # ==========================================================
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=[
+        "http://localhost:5500",
+        "http://127.0.0.1:5500"
+    ],
+    allow_credentials=False,
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["Content-Type"]
 )
+
+
+# ==========================================================
+# Serve frontend
+# ==========================================================
+
+@app.get("/", include_in_schema=False)
+def serve_frontend():
+    return FileResponse("frontend/index.html")
 
 
 # ==========================================================
@@ -52,16 +66,14 @@ class TextRequest(BaseModel):
 
 
 # ==========================================================
-# Prediction log
+# Prediction logging
 # ==========================================================
 
 LOG_FILE = "monitoring/predictions.csv"
 
 os.makedirs("monitoring", exist_ok=True)
 
-
 if not os.path.exists(LOG_FILE):
-
     with open(
         LOG_FILE,
         "w",
@@ -99,9 +111,7 @@ def health_check():
 @app.post("/predict")
 def predict_sentiment(request: TextRequest):
 
-    result = sentiment_model(
-        request.text
-    )[0]
+    result = sentiment_model(request.text)[0]
 
     sentiment = result["label"]
 
@@ -111,6 +121,7 @@ def predict_sentiment(request: TextRequest):
     )
 
     # Save prediction for monitoring
+
     with open(
         LOG_FILE,
         "a",
