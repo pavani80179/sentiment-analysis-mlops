@@ -21,3 +21,4 @@ monitoring/retraining_data.csv
 
 # Retrained candidate model
 models/bert_sentiment_kaggle_candidate/
+firebase-debug.log
