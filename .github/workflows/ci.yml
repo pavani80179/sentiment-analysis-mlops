@@ -1,12 +1,11 @@
+
 name: Sentiment Analysis CI
 
 on:
   push:
-    branches:
-      - master
+    branches: [master]
   pull_request:
-    branches:
-      - master
+    branches: [master]
 
 jobs:
   test:
@@ -28,11 +27,7 @@ jobs:
 
       - name: Check Python files
         run: |
-          python -m py_compile src/preprocess.py
-          python -m py_compile src/train.py
-          python -m py_compile src/register_model.py
-          python -m py_compile src/prepare_retraining.py
-          python -m py_compile app/main.py
+          python -m compileall -q src app monitoring
 
       - name: CI completed
         run: echo "Sentiment Analysis CI passed successfully!"
