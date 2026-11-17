@@ -1,22 +1,36 @@
+
+from pathlib import Path
 import pandas as pd
 
-production_file = "monitoring/retraining_data.csv"
-reference_file = "data/processed/kaggle_sentiment_clean.csv"
+ROOT = Path(__file__).resolve().parent.parent
 
-production = pd.read_csv(production_file)
-reference = pd.read_csv(reference_file)
+PRODUCTION_FILE = ROOT / "monitoring" / "retraining_data.csv"
 
-# Match production text with original Kaggle dataset
-label_map = reference.set_index("text")["sentiment"]
+if not PRODUCTION_FILE.exists():
+    raise FileNotFoundError(PRODUCTION_FILE)
 
-production["true_sentiment"] = production["text"].map(label_map)
+data = pd.read_csv(PRODUCTION_FILE)
 
-production.to_csv(production_file, index=False)
+required = {"text", "predicted_sentiment", "true_sentiment"}
 
-matched = production["true_sentiment"].notna().sum()
-unmatched = production["true_sentiment"].isna().sum()
+if not required.issubset(data.columns):
+    raise ValueError(f"Missing columns: {required - set(data.columns)}")
 
-print("Retraining data updated!")
-print("Total samples:", len(production))
-print("Labels found:", matched)
-print("Labels still missing:", unmatched)
+# Preserve existing labels and record their source.
+if "label_source" not in data.columns:
+    data["label_source"] = "legacy_unverified"
+
+data["true_sentiment"] = data["true_sentiment"].fillna("")
+
+# Never copy predictions into true_sentiment.
+unlabelled = data["true_sentiment"].astype(str).str.strip().eq("")
+
+data.loc[unlabelled, "label_source"] = "unlabelled"
+
+data.to_csv(PRODUCTION_FILE, index=False)
+
+print("Retraining data preparation completed.")
+print("Total examples:", len(data))
+print("Existing labels preserved:", (~unlabelled).sum())
+print("Unlabelled examples:", unlabelled.sum())
+print("Predictions converted into true labels: 0")

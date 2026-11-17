@@ -248,3 +248,39 @@ print("\nData drift monitoring completed!")
 print("HTML report:", REPORT_PATH)
 print("Raw Evidently results:", RESULTS_PATH)
 print("MLflow experiment:", EXPERIMENT_NAME)
+
+# --------------------------------------------------
+# 8. Retraining trigger decision
+# --------------------------------------------------
+
+MIN_PRODUCTION_SAMPLES = 100
+
+print("\nRetraining trigger evaluation:")
+
+if not dataset_drift:
+    retraining_decision = "NO_DRIFT"
+elif len(current_data) < MIN_PRODUCTION_SAMPLES:
+    retraining_decision = "WAITING_FOR_MORE_DATA"
+else:
+    retraining_decision = "RETRAINING_ELIGIBLE"
+
+print("Decision:", retraining_decision)
+
+with open(
+    ROOT / "monitoring" / "retraining_trigger.json",
+    "w",
+    encoding="utf-8",
+) as file:
+    json.dump(
+        {
+            "dataset_drift": dataset_drift,
+            "production_samples": len(current_data),
+            "minimum_production_samples": MIN_PRODUCTION_SAMPLES,
+            "decision": retraining_decision,
+            "automatic_retraining_enabled": False,
+        },
+        file,
+        indent=2,
+    )
+
+print("Trigger decision saved.")
