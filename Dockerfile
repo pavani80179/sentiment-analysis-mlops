@@ -8,6 +8,7 @@ RUN pip install --no-cache-dir --default-timeout=300 -r requirements.txt
 
 COPY app ./app
 COPY models ./models
+COPY frontend ./frontend
 
 EXPOSE 8000
 

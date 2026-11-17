@@ -1,0 +1,13 @@
+
+.venv
+venv
+__pycache__
+*.pyc
+.git
+.github
+.idea
+.pytest_cache
+.ipynb_checkpoints
+monitoring
+data
+notebooks
