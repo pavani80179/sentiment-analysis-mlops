@@ -3,15 +3,6 @@ name: Deploy Sentiment API to Cloud Run
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - master
-    paths:
-      - "app/**"
-      - "models/**"
-      - "requirements.txt"
-      - "Dockerfile"
-      - ".github/workflows/deploy.yml"
 
 permissions:
   contents: read
@@ -39,6 +30,12 @@ jobs:
 
       - name: Set up Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
+
+      - name: Install DVC with Google Cloud support
+        run: pip install "dvc[gs]"
+
+      - name: Pull BERT model from DVC
+        run: dvc pull bert_model.dvc
 
       - name: Configure Docker
         run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
